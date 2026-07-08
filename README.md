@@ -1,8 +1,40 @@
-# 1nine.mp3 🎧
+<div align="center">
+  <img src="assets/logo.png" alt="1nine.mp3 Logo" width="120" style="border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+  <h1>1nine.mp3 🎧</h1>
+  <p><b>Premium, audiophile-grade local web music player</b></p>
+</div>
 
-1nine.mp3 is a premium, audiophile-grade local web music player. Designed with a stunning, modern glassmorphism UI, it provides deep audio processing capabilities right in your browser. 
+---
+
+Designed with a stunning, modern glassmorphism UI, 1nine.mp3 provides deep audio processing capabilities right in your browser. 
 
 Say goodbye to flat music and hello to a fully customizable listening experience with a built-in 10-band equalizer, crossfading, concert hall reverb, and dynamic visualizers that respond to your music in real-time.
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+  <img src="assets/screenshots/player.png" alt="Main Player View" width="800" style="border-radius: 10px; margin-bottom: 20px;">
+  <br>
+  <em>The Main Player featuring dynamic glassmorphism and real-time audio visualization</em>
+</div>
+
+<br>
+
+<div align="center">
+  <img src="assets/screenshots/library.png" alt="Library View" width="800" style="border-radius: 10px; margin-bottom: 20px;">
+  <br>
+  <em>Library Management with Smart Playlists and ID3 Metadata Extraction</em>
+</div>
+
+<br>
+
+<div align="center">
+  <img src="assets/screenshots/settings.png" alt="Settings View" width="800" style="border-radius: 10px; margin-bottom: 20px;">
+  <br>
+  <em>10-Band Equalizer, Reverb settings, and Audio Processing</em>
+</div>
 
 ---
 
