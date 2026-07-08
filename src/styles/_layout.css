@@ -1,0 +1,183 @@
+/* Core Application Layout */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  font-family: var(--font-family-primary);
+  background-color: var(--color-bg-base);
+  color: var(--color-text-main);
+  /* The ambient gradient is applied to a pseudo-element or separate layer for smooth GSAP transitions */
+}
+
+#app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  z-index: var(--z-content);
+}
+
+/* Ambient Background Layer */
+#ambient-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-ambient);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 280px;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  box-sizing: border-box;
+  z-index: var(--z-content);
+  /* Sidebar uses a subtle clay surface */
+}
+
+/* Sidebar Collapse Styles */
+#sidebar.collapsed {
+  width: 80px;
+  padding: var(--spacing-xl) 10px;
+}
+#sidebar.collapsed .sidebar-text,
+#sidebar.collapsed .sidebar-search input,
+#sidebar.collapsed .sidebar-playlists h3,
+#sidebar.collapsed #btn-create-playlist,
+#sidebar.collapsed .sidebar-header img {
+  display: none;
+}
+#sidebar.collapsed .clay-btn,
+#sidebar.collapsed .sidebar-search .clay-inset {
+  width: 100%;
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+#sidebar.collapsed .clay-btn i,
+#sidebar.collapsed .sidebar-search .clay-inset i {
+  margin-right: 0 !important;
+  margin: 0 auto;
+}
+#sidebar.collapsed .sidebar-header {
+  justify-content: center !important;
+  flex-direction: column;
+}
+
+/* Main Content Area */
+#main-content {
+  flex-grow: 1;
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-content);
+}
+
+/* Hero Player Area (takes full main content initially) */
+#hero-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: all 0.5s ease;
+}
+
+.hero-album-art {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-album-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  z-index: 2;
+}
+
+#hero-art-placeholder {
+  z-index: 2;
+  font-size: var(--font-size-title);
+  color: var(--color-text-muted);
+}
+
+#hero-visualizer-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; /* larger than album art */
+  height: 600px;
+  z-index: 1; /* Behind or over? Let's put it behind so it emanates from it, or over if we want overlay. Behind is better for circular spectrum. */
+  pointer-events: none;
+}
+
+.hero-track-info {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.hero-track-info h1 {
+  font-size: var(--font-size-hero);
+  margin: 0 0 0.5rem 0;
+  font-weight: var(--font-weight-bold);
+}
+
+.hero-track-info p {
+  font-size: var(--font-size-title);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.hero-controls {
+  gap: var(--spacing-lg);
+}
+
+/* Utility layout classes */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}

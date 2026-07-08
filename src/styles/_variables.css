@@ -1,0 +1,80 @@
+:root {
+  /* Dynamic Theme Colors (Updated by ThemeEngine) */
+  --color-primary: #8a2be2;
+  --color-secondary: #ff1493;
+  --color-accent: #00ffff;
+  --color-highlight: #ffffff;
+  --color-dark-tone: #0a0a0a;
+  
+  --color-ambient-1: rgba(138, 43, 226, 0.3);
+  --color-ambient-2: rgba(255, 20, 147, 0.2);
+  
+  --color-bg-base: #1a1a2e;
+  --color-text-main: #e2e8f0;
+  --color-text-muted: #a0aec0;
+
+  /* Ambient Gradients */
+  --gradient-ambient: radial-gradient(circle at center, var(--color-ambient-1), transparent 70%);
+
+  /* Typography */
+  --font-family-primary: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-size-hero: 4rem;
+  --font-size-title: 2rem;
+  --font-size-body: 1rem;
+  --font-size-small: 0.875rem;
+  
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Claymorphism Shadows */
+  --clay-shadow-outset: 9px 9px 16px rgba(163, 177, 198, 0.6), 
+                       -9px -9px 16px rgba(255, 255, 255, 0.5);
+  --clay-shadow-inset: inset 6px 6px 10px 0 rgba(163, 177, 198, 0.6),
+                       inset -6px -6px 10px 0 rgba(255, 255, 255, 0.5);
+  --clay-shadow-hover: 12px 12px 20px rgba(163, 177, 198, 0.7), 
+                       -12px -12px 20px rgba(255, 255, 255, 0.6);
+  --clay-shadow-active: inset 4px 4px 8px rgba(163, 177, 198, 0.6),
+                        inset -4px -4px 8px rgba(255, 255, 255, 0.5);
+
+  /* Borders & Radii */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 9999px;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Z-Index */
+  --z-base: 1;
+  --z-visualizer: 5;
+  --z-content: 10;
+  --z-overlay: 100;
+  --z-modal: 1000;
+}
+
+/* Dark mode default base */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg-base: #1a1a2e;
+    --color-text-main: #e2e8f0;
+    --color-text-muted: #a0aec0;
+
+    --clay-shadow-outset: 9px 9px 16px rgba(0, 0, 0, 0.4), 
+                         -9px -9px 16px rgba(45, 45, 65, 0.4);
+    --clay-shadow-inset: inset 6px 6px 10px 0 rgba(0, 0, 0, 0.4),
+                         inset -6px -6px 10px 0 rgba(45, 45, 65, 0.4);
+    --clay-shadow-hover: 12px 12px 20px rgba(0, 0, 0, 0.5), 
+                         -12px -12px 20px rgba(45, 45, 65, 0.5);
+    --clay-shadow-active: inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+                          inset -4px -4px 8px rgba(45, 45, 65, 0.4);
+  }
+}

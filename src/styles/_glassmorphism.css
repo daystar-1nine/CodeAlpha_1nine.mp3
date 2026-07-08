@@ -1,0 +1,24 @@
+/* Glassmorphism Utility Classes */
+/* To be used strictly for Search, Dialogs, Settings, Lyrics, Overlays */
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.glass-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass-panel {
+    background: rgba(26, 26, 46, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}

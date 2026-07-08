@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1nine.mp3 - Premium Audio Experience</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+    <!-- Use CDNs for difficult CommonJS libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.4.0/color-thief.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    <!-- Add Lucide for icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body>
+    <!-- Ambient Background Layers for gradients -->
+    <div id="ambient-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -1; pointer-events: none; background: var(--color-bg-base);">
+      <div id="ambient-layer-1" class="ambient-layer" style="position: absolute; top: -10%; left: -10%; width: 60vw; height: 60vw; border-radius: 50%; background: radial-gradient(circle, var(--color-ambient-1), transparent 70%); filter: blur(80px); mix-blend-mode: multiply; opacity: 0.6; will-change: transform, opacity;"></div>
+      <div id="ambient-layer-2" class="ambient-layer" style="position: absolute; bottom: -10%; right: -10%; width: 70vw; height: 70vw; border-radius: 50%; background: radial-gradient(circle, var(--color-ambient-2), transparent 70%); filter: blur(100px); mix-blend-mode: screen; opacity: 0.4; will-change: transform, opacity;"></div>
+      <div id="ambient-layer-3" class="ambient-layer" style="position: absolute; top: 40%; left: 30%; width: 50vw; height: 50vw; border-radius: 50%; background: radial-gradient(circle, var(--color-accent), transparent 60%); filter: blur(120px); mix-blend-mode: overlay; opacity: 0.2; will-change: transform, opacity;"></div>
+    </div>
+
+    <!-- Drag & Drop Overlay -->
+    <div id="drag-overlay" class="glass-overlay flex-center flex-column" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:var(--z-modal); pointer-events:none;">
+      <i data-lucide="upload-cloud" style="width: 100px; height: 100px; color: white; margin-bottom: 2rem;"></i>
+      <h2 style="color: white; font-size: var(--font-size-title);">Drop music folder here</h2>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="glass-overlay flex-center flex-column" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:var(--z-modal);">
+      <div class="loader-spinner" style="width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin-slow 1s linear infinite; margin-bottom: 2rem;"></div>
+      <h2 style="color: white; font-size: var(--font-size-title);">Importing Music...</h2>
+      <p id="loading-text" style="color: rgba(255,255,255,0.7); margin-top: 1rem;">Scanning files</p>
+    </div>
+
+    <div id="app">
+      <!-- Sidebar Navigation -->
+      <aside id="sidebar" class="clay-surface" style="transition: width 0.3s ease, padding 0.3s ease;">
+        <div class="sidebar-header flex-row" style="margin-bottom: 2rem; align-items: center; justify-content: space-between; gap: 0.75rem;">
+          <div class="flex-row" style="align-items: center; gap: 0.75rem;">
+            <img src="assets/logo.png" alt="1nine logo" style="width: 40px; height: 40px; border-radius: var(--radius-sm); object-fit: cover; box-shadow: var(--clay-shadow-outset);">
+            <h2 class="app-title sidebar-text" style="font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">1nine.mp3</h2>
+          </div>
+          <button id="btn-collapse-sidebar" style="background: none; border: none; color: var(--color-text-muted); cursor: pointer; padding: 0.5rem;">
+            <i data-lucide="panel-left-close"></i>
+          </button>
+        </div>
+        
+        <div class="sidebar-search" style="margin-bottom: var(--spacing-lg);">
+           <div class="clay-inset flex-row" style="align-items: center; padding: 0.75rem 1rem; border-radius: var(--radius-md);">
+              <i data-lucide="search" style="width: 18px; color: var(--color-text-muted); margin-right: 10px;"></i>
+              <input type="text" id="global-search-input" placeholder="Search library..." style="background: transparent; border: none; outline: none; color: var(--color-text-main); font-family: var(--font-primary); width: 100%;">
+           </div>
+        </div>
+
+        <nav class="sidebar-nav flex-column" style="gap: var(--spacing-md); margin-top: var(--spacing-xl);">
+          <button class="clay-btn clay-surface-interactive active" id="nav-home" style="justify-content: flex-start; padding-left: var(--spacing-lg);">
+            <i data-lucide="home" style="margin-right: 12px; width: 18px;"></i> <span class="sidebar-text">Home</span>
+          </button>
+          <button class="clay-btn clay-surface-interactive" id="nav-library" style="justify-content: flex-start; padding-left: var(--spacing-lg);">
+            <i data-lucide="library" style="margin-right: 12px; width: 18px;"></i> <span class="sidebar-text">Library</span>
+          </button>
+          <button class="clay-btn clay-surface-interactive" id="nav-settings" style="justify-content: flex-start; padding-left: var(--spacing-lg);">
+            <i data-lucide="settings" style="margin-right: 12px; width: 18px;"></i> <span class="sidebar-text">Settings</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-playlists" style="margin-top: 2.5rem; flex-grow: 1; overflow-y: auto;">
+           <div class="flex-row" style="justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0 0.5rem;">
+              <h3 class="sidebar-text" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted);">Playlists</h3>
+              <button id="btn-create-playlist" class="sidebar-text" style="background: none; border: none; color: var(--color-text-muted); cursor: pointer;" title="Create Playlist">
+                 <i data-lucide="plus" style="width: 16px;"></i>
+              </button>
+           </div>
+           
+           <nav class="sidebar-nav flex-column" style="gap: 0.5rem;" id="playlist-nav-container">
+             <!-- Smart Playlists -->
+             <button class="clay-btn clay-surface-interactive" data-playlist="most-played" style="justify-content: flex-start; padding-left: var(--spacing-lg); font-size: 0.95rem; height: 40px; box-shadow: none;">
+               <i data-lucide="bar-chart-2" style="margin-right: 12px; width: 16px;"></i> <span class="sidebar-text">Most Played</span>
+             </button>
+             <button class="clay-btn clay-surface-interactive" data-playlist="recently-added" style="justify-content: flex-start; padding-left: var(--spacing-lg); font-size: 0.95rem; height: 40px; box-shadow: none;">
+               <i data-lucide="clock" style="margin-right: 12px; width: 16px;"></i> <span class="sidebar-text">Recently Added</span>
+             </button>
+             <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 0.5rem 0;"></div>
+             <!-- Custom Playlists Injected Here -->
+           </nav>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main id="main-content">
+        <!-- Hero Player (Default State) -->
+        <section id="hero-player" class="flex-center" style="width: 100%; height: 100%; padding: var(--spacing-2xl); position: absolute; z-index: 10; pointer-events: none;">
+          
+          <!-- Import overlay when empty -->
+          <div id="hero-import-overlay" class="flex-center" style="position: absolute; top: 2rem; right: 2rem; z-index: 30; pointer-events: auto;">
+             <button class="clay-btn clay-surface-interactive" id="btn-import">
+              <i data-lucide="folder-plus" style="margin-right: 8px;"></i> Import Music
+            </button>
+          </div>
+
+          <!-- The Premium Floating Card -->
+          <div id="hero-card" class="hero-player-card clay-float" style="width: 100%; max-width: 1000px; max-height: 100%; padding: clamp(1.5rem, 4vh, 3rem); border-radius: 40px; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 20; transition: box-shadow 3s ease; pointer-events: auto; box-sizing: border-box; overflow-y: auto; background: rgba(30, 30, 40, 0.85) !important; backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);">
+            
+            <!-- Now Playing Meta Badge -->
+            <div id="now-playing-meta" class="clay-inset flex-row flex-center" style="padding: 0.75rem 1.5rem; border-radius: var(--radius-pill); margin-bottom: clamp(1rem, 3vh, 2rem); gap: 1rem; font-size: var(--font-size-small); color: var(--color-text-muted); font-weight: 500; letter-spacing: 0.5px;">
+              <span id="meta-format">--</span>
+              <span style="opacity: 0.3;">•</span>
+              <span id="meta-bitrate">Unknown</span>
+              <span style="opacity: 0.3;">•</span>
+              <span id="meta-album" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Unknown Album</span>
+            </div>
+
+            <!-- Album Art & Visualizer -->
+            <div class="hero-album-art" style="position: relative; width: clamp(200px, 40vh, 350px); height: clamp(200px, 40vh, 350px); margin: 0 auto clamp(1.5rem, 4vh, 2.5rem) auto; flex-shrink: 0;">
+              <div id="vinyl-record" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: #111; box-shadow: inset 0 0 20px #000, 0 10px 40px var(--color-ambient-1); overflow: hidden; z-index: 10; transition: box-shadow 3s ease;">
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: repeating-radial-gradient(#111, #111 2px, #1a1a1a 3px, #111 4px); opacity: 0.5;"></div>
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 45deg, transparent 0%, rgba(255,255,255,0.1) 15%, transparent 30%, transparent 50%, rgba(255,255,255,0.1) 65%, transparent 80%); mix-blend-mode: overlay;"></div>
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle at 30% 30%, var(--color-ambient-2) 0%, transparent 60%); opacity: 0.3; mix-blend-mode: screen; transition: background 3s ease;"></div>
+                
+                <div id="vinyl-inner-label" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 35%; height: 35%; border-radius: 50%; background-color: var(--color-bg-base); background-size: cover; background-position: center; border: 2px solid #222; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+                  <img id="hero-art-image" src="" alt="Album Art" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                  <div id="hero-art-placeholder" class="flex-center w-full h-full" style="background: var(--color-surface);">
+                    <i data-lucide="music" style="width: 32px; height: 32px; color: var(--color-text-muted);"></i>
+                  </div>
+                  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: #000; border-radius: 50%; box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);"></div>
+                </div>
+              </div>
+              <canvas id="hero-visualizer-canvas" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140%; height: 140%; pointer-events: none; z-index: 5;"></canvas>
+            </div>
+            
+            <!-- Track Info -->
+            <div class="hero-track-info flex-column flex-center" style="margin-bottom: clamp(1.5rem, 4vh, 2.5rem);">
+              <h1 id="hero-title" style="margin-bottom: 0.5rem; font-size: clamp(1.5rem, 4vh, 2.2rem); font-weight: 800; letter-spacing: -0.5px; text-align: center;">1nine.mp3</h1>
+              <p id="hero-artist" style="font-size: clamp(1rem, 2vh, 1.2rem); color: var(--color-text-muted); font-weight: 500; text-align: center;">Designed for Listeners</p>
+            </div>
+
+            <!-- Enhanced Progress Bar -->
+            <div class="hero-progress-container w-full" style="max-width: 800px; margin-bottom: clamp(2rem, 5vh, 3.5rem);">
+              <div class="progress-labels flex-row" style="justify-content: space-between; font-size: var(--font-size-small); color: var(--color-text-muted); margin-bottom: 1rem; font-family: monospace; font-weight: 600;">
+                <span id="time-current">0:00</span>
+                <span id="time-total">0:00</span>
+              </div>
+              <div class="progress-bar-bg clay-inset" style="position: relative; width: 100%; height: 10px; border-radius: var(--radius-pill); cursor: pointer;" id="progress-container">
+                <div class="progress-bar-buffer" id="progress-buffer" style="position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: rgba(255,255,255,0.3); border-radius: inherit; pointer-events: none;"></div>
+                <div class="progress-bar-fill" id="progress-fill" style="position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: var(--color-primary); border-radius: inherit; transition: width 0.1s linear, background 3s ease, box-shadow 3s ease; box-shadow: 0 0 10px var(--color-primary); pointer-events: none;"></div>
+              </div>
+            </div>
+
+            <!-- Controls Grid -->
+            <div class="hero-controls-grid w-full" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 2rem;">
+              
+              <!-- Secondary (Left) -->
+              <div class="controls-left flex-row" style="gap: 1rem; justify-content: flex-start;">
+                <button class="clay-btn clay-surface-interactive btn-icon-sm" id="btn-favorite" title="Favorite" style="width: 44px; height: 44px; padding: 0;">
+                  <i data-lucide="heart" style="width: 20px; height: 20px;"></i>
+                </button>
+                <button class="clay-btn clay-surface-interactive btn-icon-sm" id="btn-speed" title="Playback Speed" style="width: 44px; height: 44px; padding: 0;">
+                  <span id="label-speed" style="font-weight: 700; font-size: 0.85rem;">1x</span>
+                </button>
+                <button class="clay-btn clay-surface-interactive btn-icon-sm" id="btn-sleep" title="Sleep Timer" style="width: 44px; height: 44px; padding: 0;">
+                  <i data-lucide="moon" style="width: 20px; height: 20px;"></i>
+                </button>
+                <button class="clay-btn clay-surface-interactive btn-icon-sm" id="btn-lyrics-toggle" title="Lyrics" style="width: 44px; height: 44px; padding: 0;">
+                  <i data-lucide="mic-2" style="width: 20px; height: 20px;"></i>
+                </button>
+                <button class="clay-btn clay-surface-interactive btn-icon-sm" id="btn-visualizer-toggle" title="Visualizer Studio" style="width: 44px; height: 44px; padding: 0;">
+                  <i data-lucide="activity" style="width: 20px; height: 20px;"></i>
+                </button>
+              </div>
+
+              <!-- Playback (Center) -->
+              <div class="controls-center flex-row flex-center" style="gap: 1.5rem;">
+                <button id="btn-shuffle" class="clay-btn btn-icon-md clay-surface-interactive" aria-label="Shuffle Queue">
+                  <i data-lucide="shuffle" style="width: 20px; height: 20px;"></i>
+                </button>
+                <button id="btn-prev" class="clay-btn btn-icon-lg clay-surface-interactive" aria-label="Previous Track">
+                  <i data-lucide="skip-back" style="width: 24px; height: 24px;"></i>
+                </button>
+                <button id="btn-play-pause" class="clay-btn btn-icon-xl clay-surface-interactive" style="background: var(--color-primary); color: white;" aria-label="Play or Pause">
+                  <i id="icon-play" data-lucide="play" style="width: 32px; height: 32px; fill: white;"></i>
+                  <i id="icon-pause" data-lucide="pause" style="width: 32px; height: 32px; fill: white; display: none;"></i>
+                </button>
+                <button id="btn-next" class="clay-btn btn-icon-lg clay-surface-interactive" aria-label="Next Track">
+                  <i data-lucide="skip-forward" style="width: 24px; height: 24px;"></i>
+                </button>
+                <button id="btn-repeat" class="clay-btn btn-icon-md clay-surface-interactive" aria-label="Repeat Track">
+                  <i data-lucide="repeat" style="width: 20px; height: 20px;"></i>
+                </button>
+              </div>
+
+              <!-- Volume & Queue (Right) -->
+              <div class="controls-right flex-row" style="gap: 1.5rem; justify-content: flex-end; align-items: center;">
+                <div class="volume-container flex-row" style="align-items: center; gap: 1rem; background: var(--color-bg-base); padding: 0.5rem 1.25rem; border-radius: var(--radius-pill); box-shadow: var(--clay-shadow-outset);">
+                  <button id="btn-mute" class="clay-btn btn-icon-sm" style="background: transparent; box-shadow: none;" aria-label="Mute Volume">
+                    <i id="icon-volume" data-lucide="volume-2" style="width: 18px; height: 18px;"></i>
+                  </button>
+                  <div id="volume-slider-container" class="volume-container clay-inset" style="flex-grow: 1; min-width: 100px; height: 8px; border-radius: var(--radius-pill); position: relative; cursor: pointer;" aria-label="Volume Slider" role="slider">
+                    <div id="volume-fill" style="position: absolute; top:0; left:0; height:100%; width: 100%; background: var(--color-primary); border-radius: inherit;"></div>
+                  </div>
+                </div>
+                <button id="btn-queue" class="clay-btn btn-icon-md clay-surface-interactive" aria-label="Toggle Smart Queue">
+                  <i data-lucide="list-music" style="width: 20px; height: 20px;"></i>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- Smart Queue Side Panel -->
+        <aside id="queue-panel" class="glass-overlay flex-column" style="display: none; position: fixed; top: 0; right: 0; width: 400px; height: 100vh; z-index: 50; padding: 2.5rem 2rem; border-left: 1px solid rgba(255,255,255,0.2); box-shadow: -15px 0 40px rgba(0,0,0,0.15);">
+          <div class="flex-row" style="justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700;">Up Next</h2>
+            <button class="clay-btn clay-surface-interactive" id="btn-close-queue" style="width: 44px; height: 44px; padding:0; border-radius: 50%;"><i data-lucide="x"></i></button>
+          </div>
+          <div class="flex-row" style="justify-content: space-between; margin-bottom: 1.5rem;">
+            <span id="queue-count" style="font-size: 0.9rem; color: var(--color-text-muted);">0 tracks</span>
+            <button id="btn-clear-queue" style="background: none; border: none; color: var(--color-primary); cursor: pointer; font-weight: 600; font-size: 0.9rem;">Clear All</button>
+          </div>
+          <div id="queue-list" class="flex-column" style="gap: 0.75rem; overflow-y: auto; flex-grow: 1; padding-right: 0.5rem;">
+            <!-- Rendered by QueueManager -->
+            <div id="queue-empty-state" class="flex-column flex-center" style="height: 100%; opacity: 0.5;">
+              <i data-lucide="coffee" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+              <p>Queue is empty</p>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Visualizer Studio Side Panel -->
+        <aside id="visualizer-panel" class="glass-overlay flex-column" style="display: none; position: fixed; top: 0; left: 0; width: 400px; height: 100vh; z-index: 50; padding: 2.5rem 2rem; border-right: 1px solid rgba(255,255,255,0.2); box-shadow: 15px 0 40px rgba(0,0,0,0.15);">
+          <div class="flex-row" style="justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700;">Visualizer Studio</h2>
+            <button class="clay-btn clay-surface-interactive" id="btn-close-visualizer" style="width: 44px; height: 44px; padding:0; border-radius: 50%;"><i data-lucide="x"></i></button>
+          </div>
+          <div class="flex-column" style="gap: 2rem; overflow-y: auto;">
+            
+            <div class="clay-surface" style="padding: 1.5rem;">
+              <h3 style="margin-bottom: 1.25rem; font-size: 1.1rem;">Engine Mode</h3>
+              <div class="flex-column" style="gap: 0.75rem;" id="visualizer-modes">
+                <button class="clay-btn w-full" data-mode="circular" style="justify-content: flex-start; padding: 1rem;">
+                  <i data-lucide="circle-dashed" style="margin-right: 12px;"></i> Circular Spectrum
+                </button>
+                <button class="clay-btn w-full" data-mode="bars" style="justify-content: flex-start; padding: 1rem;">
+                  <i data-lucide="bar-chart-2" style="margin-right: 12px;"></i> Frequency Bars
+                </button>
+                <button class="clay-btn w-full" data-mode="wave" style="justify-content: flex-start; padding: 1rem; opacity: 0.6; pointer-events: none;">
+                  <i data-lucide="activity" style="margin-right: 12px;"></i> Oscilloscope (Soon)
+                </button>
+              </div>
+            </div>
+
+            <div class="clay-surface" style="padding: 1.5rem;">
+              <h3 style="margin-bottom: 1.25rem; font-size: 1.1rem;">Options</h3>
+              <button class="clay-btn w-full" id="btn-performance-mode" style="justify-content: flex-start; padding: 1rem; color: var(--color-text-main);">
+                <i data-lucide="zap" style="margin-right: 12px;"></i> Performance Mode: Off
+              </button>
+            </div>
+
+          </div>
+        </aside>
+
+        <!-- Lyrics Panel -->
+        <aside id="lyrics-panel" class="glass-overlay flex-column" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 45; padding: 4rem 10%; border-right: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(40px);">
+          <div class="flex-row" style="justify-content: flex-end; align-items: center; margin-bottom: 2rem;">
+            <button class="clay-btn clay-surface-interactive" id="btn-close-lyrics" style="width: 60px; height: 60px; padding:0; border-radius: 50%;"><i data-lucide="x" style="width: 32px; height: 32px;"></i></button>
+          </div>
+          <div id="lyrics-container" class="flex-column" style="gap: 2rem; overflow-y: auto; flex-grow: 1; align-items: center; padding-bottom: 50vh; scroll-behavior: smooth;">
+             <p id="lyrics-placeholder" style="font-size: 2rem; font-weight: 700; color: rgba(255,255,255,0.5);">No lyrics available</p>
+          </div>
+        </aside>
+
+        <!-- Sleep Timer Modal -->
+        <dialog id="sleep-timer-modal" class="glass-overlay clay-surface" style="border: none; border-radius: var(--radius-xl); padding: 2rem; width: 350px; text-align: center; color: var(--color-text-main); margin: auto;">
+           <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.5rem;">Sleep Timer</h3>
+           <p style="color: var(--color-text-muted); margin-bottom: 2rem;">Stop audio playback after:</p>
+           <div class="flex-column" style="gap: 1rem; margin-bottom: 2rem;">
+              <button class="clay-btn sleep-option" data-time="15">15 Minutes</button>
+              <button class="clay-btn sleep-option" data-time="30">30 Minutes</button>
+              <button class="clay-btn sleep-option" data-time="45">45 Minutes</button>
+              <button class="clay-btn sleep-option" data-time="60">60 Minutes</button>
+           </div>
+           <button class="clay-btn" id="btn-cancel-sleep" style="width: 100%; background: #ef4444; color: white;">Cancel Timer</button>
+           <button class="clay-btn" id="btn-close-sleep-modal" style="width: 100%; margin-top: 1rem; background: transparent; box-shadow: none;">Close</button>
+        </dialog>
+
+        <!-- Library View (Hidden initially) -->
+        <section id="library-view" style="display: none; padding: var(--spacing-2xl); width: 100%; height: 100%; overflow-y: auto;">
+          <div class="flex-row" style="justify-content: space-between; align-items: center; margin-bottom: var(--spacing-2xl);">
+            <h2 style="font-size: var(--font-size-hero); font-weight: var(--font-weight-bold); margin: 0;">Your Music</h2>
+            <button class="clay-btn clay-surface-interactive" id="btn-library-import">
+              <i data-lucide="folder-plus" style="margin-right: 8px;"></i> Import Music
+            </button>
+          </div>
+          
+          <div id="library-empty-state" class="flex-column flex-center" style="height: 60%; color: var(--color-text-muted);">
+            <i data-lucide="music-4" style="width: 64px; height: 64px; margin-bottom: 1rem; opacity: 0.5;"></i>
+            <h3>Your library is empty</h3>
+            <p>Import a folder or drag and drop it anywhere</p>
+          </div>
+
+          <div id="library-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--spacing-xl); display: none;">
+            <!-- Rendered by LibraryManager -->
+          </div>
+        </section>
+        
+        <!-- Settings View (Hidden initially) -->
+        <section id="settings-view" style="display: none; padding: var(--spacing-2xl); width: 100%; height: 100%; overflow-y: auto;">
+          <h2 style="font-size: var(--font-size-hero); font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-2xl);">Settings</h2>
+          
+          <div class="clay-surface" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-lg);">
+            <h3 style="margin-top: 0;">Appearance</h3>
+            <div class="flex-row" style="gap: var(--spacing-lg); align-items: center; margin-top: var(--spacing-md);">
+              <label>Dark Mode</label>
+              <input type="checkbox" id="setting-dark-mode" checked>
+            </div>
+          </div>
+
+          <div class="clay-surface" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-lg);">
+            <h3 style="margin-top: 0;">Audio Processing & Effects</h3>
+            
+            <div style="margin-top: var(--spacing-md); margin-bottom: var(--spacing-xl);">
+              <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Equalizer Preset</label>
+              <select id="eq-preset" class="clay-inset" style="width: 100%; max-width: 300px; padding: 0.75rem; border: none; border-radius: var(--radius-md); background: transparent; color: var(--color-text-main); outline: none;">
+                <option value="flat">Flat</option>
+                <option value="bassBoost">Bass Boost</option>
+                <option value="electronic">Electronic</option>
+                <option value="acoustic">Acoustic</option>
+                <option value="vocal">Vocal Enhancer</option>
+                <option value="rock">Rock</option>
+                <option value="pop">Pop</option>
+              </select>
+            </div>
+
+            <!-- 10 Band EQ Sliders -->
+            <div class="flex-row" style="gap: 1rem; justify-content: space-between; overflow-x: auto; padding-bottom: 1rem;" id="eq-sliders">
+              <!-- Will be generated by JS -->
+            </div>
+
+            <div style="margin-top: var(--spacing-xl); border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--spacing-xl);">
+               <label style="display: block; font-weight: 600; margin-bottom: 1rem;">Concert Hall Reverb</label>
+               <input type="range" id="slider-reverb" min="0" max="1" step="0.01" value="0" style="width: 100%; max-width: 300px;">
+            </div>
+
+            <div style="margin-top: var(--spacing-xl); border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--spacing-xl);">
+               <label style="display: block; font-weight: 600; margin-bottom: 1rem;">Crossfade Duration (Seconds)</label>
+               <input type="range" id="slider-crossfade" min="0" max="10" step="1" value="0" style="width: 100%; max-width: 300px;">
+               <span id="label-crossfade" style="margin-left: 1rem; font-weight: 600;">0s (Off)</span>
+            </div>
+            
+            <div style="margin-top: var(--spacing-xl); border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--spacing-xl);">
+               <label style="display: block; font-weight: 600; margin-bottom: 1rem;">Preserve Pitch on Speed Change</label>
+               <input type="checkbox" id="setting-preserve-pitch" checked>
+            </div>
+          </div>
+          
+          <div class="clay-surface" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-lg);">
+            <h3 style="margin-top: 0;">Themes</h3>
+            <div class="flex-row" style="gap: var(--spacing-md); flex-wrap: wrap; margin-top: var(--spacing-md);" id="theme-selector">
+              <button class="clay-btn theme-btn" data-theme="dynamic" style="border: 2px solid var(--color-primary);">Dynamic (Cover Art)</button>
+              <button class="clay-btn theme-btn" data-theme="neon">Neon Night</button>
+              <button class="clay-btn theme-btn" data-theme="sunset">Sunset Vibes</button>
+              <button class="clay-btn theme-btn" data-theme="ocean">Ocean Deep</button>
+              <button class="clay-btn theme-btn" data-theme="forest">Forest Ambient</button>
+              <button class="clay-btn theme-btn" data-theme="monochrome">Monochrome</button>
+            </div>
+          </div>
+          
+          <div class="clay-surface" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-lg);">
+            <h3 style="margin-top: 0;">Storage</h3>
+            <button class="clay-btn clay-surface-interactive" id="btn-clear-library" style="background: #ef4444; color: white;">
+              <i data-lucide="trash-2" style="margin-right: 8px;"></i> Clear Library
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

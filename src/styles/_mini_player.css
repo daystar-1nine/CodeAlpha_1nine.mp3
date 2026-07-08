@@ -1,0 +1,113 @@
+/* Add to the end of _layout.css or _animations.css */
+#hero-card.mini-player-mode {
+  position: fixed !important;
+  bottom: 2rem !important;
+  left: 310px !important; /* Sidebar width (280) + margin */
+  width: 320px !important;
+  padding: 1.5rem !important;
+  border-radius: var(--radius-lg) !important;
+  transform: none !important;
+  z-index: 100 !important;
+}
+
+/* Ensure the hero view container stays rendered so the fixed child is visible */
+#view-hero:has(#hero-card.mini-player-mode) {
+  display: block !important;
+  height: 0 !important;
+  overflow: visible !important;
+}
+
+
+#hero-card.mini-player-mode .hero-album-art {
+  width: 120px !important;
+  height: 120px !important;
+  margin-bottom: 1rem !important;
+}
+
+#hero-card.mini-player-mode #hero-title {
+  font-size: 1.2rem !important;
+}
+
+#hero-card.mini-player-mode #hero-artist {
+  font-size: 0.9rem !important;
+}
+
+#hero-card.mini-player-mode .controls-left,
+#hero-card.mini-player-mode .controls-right,
+#hero-card.mini-player-mode .hero-progress-container,
+#hero-card.mini-player-mode #now-playing-meta {
+  display: none !important;
+}
+
+#hero-player:has(#hero-card.mini-player-mode) #hero-import-overlay {
+  display: none !important;
+}
+
+#hero-card.mini-player-mode #hero-visualizer-canvas {
+  display: none !important;
+}
+
+#hero-card.mini-player-mode .hero-track-info {
+  margin-bottom: 1rem !important;
+}
+
+#hero-card.mini-player-mode .hero-controls-grid {
+  grid-template-columns: 1fr !important;
+  gap: 1rem !important;
+}
+
+#hero-card.mini-player-mode .btn-icon-xl {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+#hero-card.mini-player-mode .btn-icon-lg {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+#hero-card.mini-player-mode .btn-icon-md {
+  width: 38px !important;
+  height: 38px !important;
+}
+
+@media (max-width: 768px) {
+  #hero-card.mini-player-mode {
+    left: 1rem !important;
+    right: 1rem !important;
+    width: auto !important;
+    bottom: 5rem !important; /* above mobile nav if any */
+    display: flex !important;
+    flex-direction: row !important;
+    padding: 0.5rem 1rem !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  
+  #hero-card.mini-player-mode .hero-album-art {
+    width: 40px !important;
+    height: 40px !important;
+    margin-bottom: 0 !important;
+  }
+  
+  #hero-card.mini-player-mode .hero-track-info {
+    margin-bottom: 0 !important;
+    text-align: left !important;
+    flex-grow: 1 !important;
+    margin-left: 1rem !important;
+  }
+  
+  #hero-card.mini-player-mode #hero-title {
+    font-size: 0.95rem !important;
+    margin-bottom: 0 !important;
+  }
+  
+  #hero-card.mini-player-mode .controls-center {
+    gap: 0.5rem !important;
+  }
+  
+  #hero-card.mini-player-mode #btn-shuffle,
+  #hero-card.mini-player-mode #btn-repeat {
+    display: none !important;
+  }
+}
